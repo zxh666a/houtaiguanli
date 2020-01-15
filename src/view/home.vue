@@ -3,7 +3,7 @@
     <!-- 头部 -->
     <el-header>
       <div @click="back" class="avator">
-        <img src="../assets/timg.png" alt />
+        <img src="../assets/timg.png"  />
         <span>熊猫电商管理系统</span>
       </div>
       <el-button @click="logout" type="info">退出</el-button>
@@ -121,9 +121,10 @@ export default {
       margin-left: 40px;
     }
     img {
-      width: 60px;
-      height: 60px;
+      width: 50px;
+      height: 50px;
       border-radius: 50%;
+      border: 2px solid #fff
     }
   }
 }
