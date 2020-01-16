@@ -52,7 +52,13 @@
               ></el-button>
             </el-tooltip>
             <el-tooltip effect="dark" content="分配成员" placement="top" :enterable="false">
-              <el-button type="warning" icon="el-icon-star-off" circle size="mini"></el-button>
+              <el-button
+                type="warning"
+                icon="el-icon-star-off"
+                circle
+                size="mini"
+                @click="showdialog(scope.row)"
+              ></el-button>
             </el-tooltip>
           </template>
         </el-table-column>
@@ -125,6 +131,33 @@
         <span slot="footer" class="dialog-footer">
           <el-button @click="editdialogVisible = false">取 消</el-button>
           <el-button type="primary" @click="edituserinfo">确 定</el-button>
+        </span>
+      </el-dialog>
+      <!-- 分配角色 -->
+      <el-dialog
+        title="分配角色"
+        :visible.sync="fenpei_dialogVisible"
+        width="50%"
+        @close="roledialogclose"
+      >
+        <div>
+          <p>当前用户：{{userinfo.username}}</p>
+          <p>当前角色：{{userinfo.role_name}}</p>
+          <p>
+            分配新角色：
+            <el-select placeholder="请选择" v-model="selectedroleid">
+              <el-option
+                v-for="item in roleslist"
+                :key="item.id"
+                :label="item.roleName"
+                :value="item.id"
+              ></el-option>
+            </el-select>
+          </p>
+        </div>
+        <span slot="footer" class="dialog-footer">
+          <el-button @click="fenpei_dialogVisible = false">取 消</el-button>
+          <el-button type="primary" @click="tijiao">确 定</el-button>
         </span>
       </el-dialog>
     </el-card>
@@ -207,7 +240,15 @@ export default {
           { min: 11, max: 11, message: "请输入11位手机号", trigger: "blur" },
           { validator: checkemobile, trigger: "blur" }
         ]
-      }
+      },
+      //分配觉色
+      fenpei_dialogVisible: false,
+      //角色信息
+      userinfo: {},
+      //所有权限
+      roleslist: [],
+      //已选中的角色id
+      selectedroleid: ""
     };
   },
   methods: {
@@ -307,10 +348,40 @@ export default {
 
       if (confirmresult !== "confirm")
         return this.$message.info("已取消删除操作");
-     const {data:res}  = await this.$http.delete("users/" + id, id);
-     if(res.meta.status !==200) return this.$message.error('删除失败')
-     this.$message.success('删除成功')
+      const { data: res } = await this.$http.delete("users/" + id, id);
+      if (res.meta.status !== 200) return this.$message.error("删除失败");
+      this.$message.success("删除成功");
       this.getuserlist();
+    },
+    // 分配角色
+    async showdialog(userinfo) {
+      this.userinfo = userinfo;
+
+      //获取所有角色列表
+      const { data: res } = await this.$http.get("roles");
+      if (res.meta.status !== 200)
+        return this.$message.error("获取角色列表失败");
+      this.roleslist = res.data;
+      this.fenpei_dialogVisible = true;
+    },
+    //提交角色分配
+    async tijiao() {
+      if (!this.selectedroleid) return this.$message.error("请选择角色");
+      const { data: res } = await this.$http.put(
+        `users/${this.userinfo.id}/role`,
+        {
+          rid: this.selectedroleid
+        }
+      );
+      if (res.meta.status !== 200) return this.$message.error("更新失败");
+      this.$message.success("更新成功");
+      this.getuserlist();
+      this.fenpei_dialogVisible = false;
+    },
+    //角色对话框的关闭时间
+    roledialogclose(){
+      this.selectedroleid = ''
+      this.userinfo = ''
     }
   }
 };
@@ -323,9 +394,6 @@ export default {
 }
 //卡片式图
 .box-card {
-  margin-top: 20px;
-  width: 100%;
-  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.15) !important;
   .clearfix:before,
   .clearfix:after {
     display: table;
@@ -339,13 +407,6 @@ export default {
   }
   .text {
     font-size: 14px;
-  }
-  .el-table {
-    margin-top: 20px;
-    font-size: 14px;
-  }
-  .el-pagination {
-    margin-top: 20px;
   }
 }
 </style>

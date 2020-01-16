@@ -5,6 +5,8 @@ import login from "./view/login"
 import home from "./view/home"
 import welcome from "./view/welcome"
 import users from './components/user/user'
+import rights from "./components/power/rights"
+import roles from "./components/power/roles"
 
 Vue.use(Router)
 
@@ -18,9 +20,11 @@ const router = new Router({
             component: home,
             children: [
                 { path: '/welcome', component: welcome },
-                { path: '/users', component: users }
+                { path: '/users', component: users },
+                { path: '/rights', component: rights },
+                { path: '/roles', component: roles }
             ]
-        }
+        },
     ]
 })
 //挂载路由导航守卫
