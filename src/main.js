@@ -3,6 +3,9 @@ import App from './App.vue'
 import router from "./router"
 
 
+import tree from "vue-table-with-tree-grid"
+
+
 import 'element-ui/lib/theme-chalk/index.css';
 import "../src/plugins/element.js"
 import "./assets/css/global.css"
@@ -15,6 +18,7 @@ axios.interceptors.request.use(config=>{
   return config
 })
 Vue.prototype.$http = axios
+Vue.component('tree-table',tree)
 
 
 new Vue({
