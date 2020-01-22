@@ -12,6 +12,7 @@ import params from './components/goods_/params'
 import goodslist from './components/goods_/goodslist'
 import addgoods from './components/goods_/addgoods'
 import order from './components/order/order'
+import report from './components/report/report'
 
 Vue.use(Router)
 
@@ -28,11 +29,12 @@ const router = new Router({
                 { path: '/users', component: users },
                 { path: '/rights', component: rights },
                 { path: '/roles', component: roles },
-                {path:'/categories',component:cate},
-                {path:'/params',component:params},
-                {path:'/goods',component:goodslist},
-                {path:'/goods/add',component:addgoods},
-                {path:'/orders',component:order}
+                { path: '/categories', component: cate },
+                { path: '/params', component: params },
+                { path: '/goods', component: goodslist },
+                { path: '/goods/add', component: addgoods },
+                { path: '/orders', component: order },
+                { path: '/reports', component: report }
             ]
         },
     ]
