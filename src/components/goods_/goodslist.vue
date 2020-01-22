@@ -31,7 +31,12 @@
         </el-table-column>
         <el-table-column label="操作" width="130px">
           <template slot-scope="scope">
-            <el-button type="primary" icon="el-icon-edit" size="mini"></el-button>
+            <el-button
+              type="primary"
+              icon="el-icon-edit"
+              size="mini"
+              @click="edit_goods(scope.row.goods_id)"
+            ></el-button>
             <el-button
               type="danger"
               icon="el-icon-delete"
@@ -53,6 +58,29 @@
         :total="total"
       ></el-pagination>
     </el-card>
+    <!-- 编辑商品 -->
+    <el-dialog title="修改商品" :visible.sync="edit_Visible" width="50%">
+      <el-form
+        :model="edit_goodsform"
+        ref="edit_formref"
+        label-width="80px"
+        :rules="edit_form_rules"
+      >
+        <el-form-item label="商品名称" prop="goods_name" ref="edit_dia_refs">
+          <el-input v-model="edit_goodsform.goods_name"></el-input>
+        </el-form-item>
+        <el-form-item label="商品价格" prop="goods_price" ref="edit_dia_refs">
+          <el-input v-model="edit_goodsform.goods_price" type="number"></el-input>
+        </el-form-item>
+        <el-form-item label="商品数量" prop="goods_number" ref="edit_dia_refs">
+          <el-input v-model="edit_goodsform.goods_number" type="number"></el-input>
+        </el-form-item>
+      </el-form>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="edit_Visible = false">取 消</el-button>
+        <el-button type="primary" @click="submit_goods">确 定</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 
@@ -68,7 +96,22 @@ export default {
         pagesize: 5
       },
       total: 0,
-      goodslist: []
+      goodslist: [],
+      edit_goodsform: {
+        goods_weight: 1
+      },
+      edit_Visible: false,
+      edit_form_rules: {
+        goods_name: [
+          { required: true, message: "请输入商品名称", trigger: "blur" }
+        ],
+        goods_price: [
+          { required: true, message: "请输入商品价格", trigger: "blur" }
+        ],
+        goods_number: [
+          { required: true, message: "请输入商品数量", trigger: "blur" }
+        ]
+      }
     };
   },
   created() {
@@ -114,6 +157,26 @@ export default {
     },
     goadd_page() {
       this.$router.push("/goods/add");
+    },
+    async edit_goods(id) {
+      const { data: res } = await this.$http.get("goods/" + id);
+      if (res.meta.status !== 200) return this.$message.error("失败");
+      this.edit_goodsform = res.data;
+      this.edit_Visible = true;
+      console.log(this.edit_goodsform);
+    },
+    submit_goods() {
+      this.$refs.edit_formref.validate(async valid => {
+        if (!valid) return;
+        const { data: res } = await this.$http.put(
+          `goods/${this.edit_goodsform.goods_id}`,
+          this.edit_goodsform
+        );
+        if (res.meta.status !== 200) return this.$message("修改失败");
+        this.$message.success('修改成功')
+        this.edit_Visible = false
+        this.getgoodslist()
+      });
     }
   }
 };
